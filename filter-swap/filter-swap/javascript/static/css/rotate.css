@@ -1,0 +1,18 @@
+html,
+body {
+  height: 100%;
+  width: 100%;
+}
+
+#launchmain {
+  transform: translateY(+150%) rotate(-90deg);
+  font-size: 5.9vh;
+  width: 100%;
+  display: inline-block;
+  margin: auto auto;
+  line-height: 90px;
+  text-align: left;
+  top: 50%;
+  left: 100%;
+}
+
