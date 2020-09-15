@@ -6,9 +6,19 @@ const yargs = require("yargs");
 const fs = require("fs");
 const crypto = require("crypto");
 const express = require("express");
+const session = require("express-session");
+const cookieParser = require("cookie-parser");
 const app = express();
 
 app.use(express.static(__dirname + '/static'));
+app.use(cookieParser());
+app.use(session({
+	secret: "My awesome filter swap secret",
+	name: "my awesome secret",
+	proxy: true,
+	resave: true,
+	saveUninitialized: true
+}));
 
 function add(filters, filter) {
     filters.filter.push(filter);
@@ -39,7 +49,6 @@ function init() {
 app.get("/initialize", async (req, res) => {
     console.log("Initialized");
     init();
-    //res.send("Initialized");
     res.sendFile(__dirname + '/static/init.html');  
 });
 
@@ -85,8 +94,15 @@ app.get("/initblockchain", async (req, res) => {
     }
 });
 
+app.get("/logout", async (req,res) => {
+    console.log("logout");
+    let sess = req.session;
+    sess.login = false;
+    req.session.destroy();
+    res.send("Logged out");
+});
 
-app.get("/checkuser", async (req, res) => {
+app.get("/login", async (req, res) => {
     console.log("Check if user exists");
     const ccpPath = path.join(process.cwd(), "config", "connection-org1.json");
     console.log(ccpPath);
@@ -116,7 +132,8 @@ app.get("/checkuser", async (req, res) => {
                 asLocalhost: true,
             },
         });
-
+	let sess = req.session;
+	sess.login = true;
         res.send("Login successful");
     } catch (Error) {
         res.send("Something wrong happened");
@@ -125,6 +142,14 @@ app.get("/checkuser", async (req, res) => {
 
 app.get("/replacefilter", async (req, res) => {
     console.log("Replace filter");
+    let sess = req.session;
+    if(sess.login) {
+	    console.log("Logged in? " + sess.login);
+    } else {
+	    console.log("Not logged in! " + sess.login);
+	    res.send("Not logged in!");
+	    return;
+    }
     const ccpPath = path.join(process.cwd(), "config", "connection-org1.json");
     console.log(ccpPath);
 
@@ -189,6 +214,14 @@ app.get("/replacefilter", async (req, res) => {
 
 app.get("/replacepart", async (req, res) => {
     console.log("Replace filter");
+    let sess = req.session;
+    if(sess.login) {
+	    console.log("Logged in? " + sess.login);
+    } else {
+	    console.log("Not logged in! " + sess.login);
+	    res.send("Not logged in!");
+	    return;
+    }
     const ccpPath = path.join(process.cwd(), "config", "connection-org1.json");
     console.log(ccpPath);
 
@@ -236,6 +269,14 @@ app.get("/replacepart", async (req, res) => {
 
 app.get("/registermachine", async (req, res) => {
     console.log("Register machine");
+    let sess = req.session;
+    if(sess.login) {
+	    console.log("Logged in? " + sess.login);
+    } else {
+	    console.log("Not logged in! " + sess.login);
+	    res.send("Not logged in!");
+	    return;
+    }
     const ccpPath = path.join(process.cwd(), "config", "connection-org1.json");
     console.log(ccpPath);
 
@@ -279,6 +320,14 @@ app.get("/registermachine", async (req, res) => {
 
 app.get("/queryall", async (req, res) => {
     console.log("Query all");
+    let sess = req.session;
+    if(sess.login) {
+	    console.log("Logged in? " + sess.login);
+    } else {
+	    console.log("Not logged in! " + sess.login);
+	    res.send("Not logged in!");
+	    return;
+    }
     const ccpPath = path.join(process.cwd(), "config", "connection-org1.json");
     console.log(ccpPath);
 
@@ -312,7 +361,7 @@ app.get("/queryall", async (req, res) => {
         const transaction = contract.createTransaction("queryAll");
 
         let response = await transaction.submit();
-
+	console.log(response.toString());
         res.send(response.toString());
     } catch (Error) {
         res.send("Something bad happened: " + Error);
