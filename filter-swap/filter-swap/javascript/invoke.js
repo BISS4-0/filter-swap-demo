@@ -10,6 +10,7 @@ const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const app = express();
 
+app.set('view engine', 'ejs');
 app.use(express.static(__dirname + '/static'));
 app.use(cookieParser());
 app.use(session({
@@ -66,7 +67,7 @@ app.get("/initblockchain", async (req, res) => {
         const userExists = await wallet.exists("user1");
 
         if (!userExists) {
-            res.send("User does not exist");
+            res.sendFile(__dirname + '/static/loginfailure.html');
         }
 
         // Create a new gateway for connecting to our peer node.
@@ -88,7 +89,9 @@ app.get("/initblockchain", async (req, res) => {
 
         let response = await transaction.submit();
 
-        res.send(response.toString());
+	res.render(__dirname + '/static/initbc', {
+		response: response.toString()
+	});
     } catch (Error) {
         res.send("Something bad happened: " + Error);
     }
@@ -99,7 +102,7 @@ app.get("/logout", async (req,res) => {
     let sess = req.session;
     sess.login = false;
     req.session.destroy();
-    res.send("Logged out");
+    res.sendFile(__dirname + '/static/logout.html');
 });
 
 app.get("/login", async (req, res) => {
@@ -109,7 +112,8 @@ app.get("/login", async (req, res) => {
 
     try {
         // Create a new file system based wallet for managing identities.
-        const walletPath = path.join(
+        console.log("Try to login as " + req.query.user);
+	const walletPath = path.join(
             process.cwd(),
             "wallet_" + req.query.user + "_Org1"
         );
@@ -119,8 +123,10 @@ app.get("/login", async (req, res) => {
         const userExists = await wallet.exists(req.query.user);
 
         if (!userExists) {
-            res.send("User does not exist");
-        }
+           res.sendFile(__dirname + '/static/loginfailure.html');
+        } else {
+		console.log("User exists");
+	}
 
         // Create a new gateway for connecting to our peer node.
         const gateway = new Gateway();
@@ -134,11 +140,12 @@ app.get("/login", async (req, res) => {
         });
 	let sess = req.session;
 	sess.login = true;
-        res.send("Login successful");
+        res.sendFile(__dirname + '/static/login.html');
     } catch (Error) {
-        res.send("Something wrong happened");
+        res.sendFile(__dirname + '/static/loginfailure.html');
     }
 });
+
 
 app.get("/replacefilter", async (req, res) => {
     console.log("Replace filter");
@@ -198,7 +205,9 @@ app.get("/replacefilter", async (req, res) => {
                 newfilter
             );
             init();
-            res.send(String("Filter replaced: " + response));
+    		res.render(__dirname + '/static/replace', {
+		response: response.toString()	
+	});
         } catch (Error) {
             res.send("Something bad happened");
         }
@@ -208,10 +217,13 @@ app.get("/replacefilter", async (req, res) => {
         );
         filters = add(filters, req.query.filter);
         write(filters);
-        res.send(String("Marked filter to be replaced: " + req.query.filter));
+	res.render(__dirname + '/static/replace', {
+		response: req.query.filter	
+	});
     }
 });
 
+/*
 app.get("/replacepart", async (req, res) => {
     console.log("Replace filter");
     let sess = req.session;
@@ -219,7 +231,7 @@ app.get("/replacepart", async (req, res) => {
 	    console.log("Logged in? " + sess.login);
     } else {
 	    console.log("Not logged in! " + sess.login);
-	    res.send("Not logged in!");
+	    res.sendFile(__dirfile + '/static/loginfailure.html');
 	    return;
     }
     const ccpPath = path.join(process.cwd(), "config", "connection-org1.json");
@@ -234,7 +246,7 @@ app.get("/replacepart", async (req, res) => {
         const userExists = await wallet.exists("user1");
 
         if (!userExists) {
-            res.send("User does not exist");
+            res.sendFile(__dirname + '/static/loginfailure.html');
         }
 
         // Create a new gateway for connecting to our peer node.
@@ -261,11 +273,15 @@ app.get("/replacepart", async (req, res) => {
             req.query.oldfilter,
             req.query.newfilter
         );
-        res.send(String("Transaction sucessful: " + response));
+	
+	res.render(__dirname + '/static/replace', {
+		response: response.toString()	
+	});
     } catch (Error) {
         res.send("Something bad happened");
     }
 });
+*/
 
 app.get("/registermachine", async (req, res) => {
     console.log("Register machine");
@@ -274,7 +290,7 @@ app.get("/registermachine", async (req, res) => {
 	    console.log("Logged in? " + sess.login);
     } else {
 	    console.log("Not logged in! " + sess.login);
-	    res.send("Not logged in!");
+	    res.sendFile(__dirname + '/static/loginfailure.html');
 	    return;
     }
     const ccpPath = path.join(process.cwd(), "config", "connection-org1.json");
@@ -289,7 +305,7 @@ app.get("/registermachine", async (req, res) => {
         const userExists = await wallet.exists("user1");
 
         if (!userExists) {
-            res.send("User does not exist");
+            res.sendFile(__dirname + '/static/loginfailure.html');
         }
 
         // Create a new gateway for connecting to our peer node.
@@ -312,7 +328,9 @@ app.get("/registermachine", async (req, res) => {
         let transactionID = await transaction.getTransactionID();
 
         let response = await transaction.submit(req.query.machine);
-        res.send(String("Transaction sucessful: " + response));
+	res.render(__dirname + '/static/replace', {
+		response: response.toString()	
+	});
     } catch (Error) {
         res.send("Something bad happened");
     }
@@ -362,7 +380,9 @@ app.get("/queryall", async (req, res) => {
 
         let response = await transaction.submit();
 	console.log(response.toString());
-        res.send(response.toString());
+	res.render(__dirname + '/static/replace', {
+		response: response.toString()	
+	});
     } catch (Error) {
         res.send("Something bad happened: " + Error);
     }
@@ -404,7 +424,9 @@ app.get("/deleteall", async (req, res) => {
 
         let response = await transaction.submit();
 
-        res.send(response.toString());
+	res.render(__dirname + '/static/replace', {
+		response: response.toString()	
+	});
     } catch (Error) {
         res.send("Something bad happened: " + Error);
     }
