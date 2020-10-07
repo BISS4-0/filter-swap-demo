@@ -18,6 +18,8 @@
         "fabric-ca-client": "~1.4.4",
         "fabric-network": "~1.4.4",
         "express": "~4.17.1",
+        "express-session": "~1.17.1",
+        "cookie-parser": "~1.4.5",
         "nano": "^8.1.0",
         "request-promise": "~4.2.5",
         "prettyjson": "~1.2.1",
