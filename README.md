@@ -13,12 +13,12 @@ Die benötigte Infrastruktur besteht aus:
 3. Port 3000 von Guest an Port 3000 von Host
 4. Starten der VM
 5. Starten der Blockchain mit den Befehlen:
-    - /home/ubuntu/filter-swap/filter-swap/startFabric.sh
-    - /home/ubuntu/filter-swap/filter-swap/copy-connection-profile.sh
-    - /home/ubuntu/filter-swap/filter-swap/javascript rm -r wallet_admin_Org1 wallet_user1_Org1
-    - /home/ubuntu/filter-swap/filter-swap/javascript/enrollAdmin.sh
-    - /home/ubuntu/filter-swap/filter-swap/javascript/registerUser1.sh
-    - node /home/ubuntu/filter-swap/filter-swap/javascript/invoke.js
+    - /home/ubuntu/filter-swap/startFabric.sh
+    - /home/ubuntu/filter-swap/copy-connection-profile.sh
+    - /home/ubuntu/filter-swap/javascript rm -r wallet_admin_Org1 wallet_user1_Org1
+    - /home/ubuntu/filter-swap/javascript/enrollAdmin.sh
+    - /home/ubuntu/filter-swap/javascript/registerUser1.sh
+    - node /home/ubuntu/filter-swap/javascript/invoke.js
 6. Starten des Wifi Hotspots auf dem Host PC oder Laptop
     - Interface Name des Wifi Adapters bestimmen:
     - ifconfig oder ip a
